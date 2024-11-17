@@ -1,3 +1,4 @@
+//app.js should be responsible for creating and configuring the Express application, setting up routes, middleware, etc.
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";

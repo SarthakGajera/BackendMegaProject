@@ -1,9 +1,10 @@
 //require('dotenv').config({path:"./env"})
+//index.js is where the application should be started (i.e., listening on a port).
 import dotenv from "dotenv";
-import express from "express";
-import connectDB from "./db/index.js";
 
-const app = express();
+import connectDB from "./db/index.js";
+import {app} from './app.js'
+
 
 dotenv.config({
   path: "./env",
