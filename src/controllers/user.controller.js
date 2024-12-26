@@ -95,6 +95,9 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
+
+
+
 const loginUser = asyncHandler(async (req, res) => {
   //req body->data
   //username or email
@@ -151,4 +154,28 @@ const loginUser = asyncHandler(async (req, res) => {
 
 });
 
-export { registerUser, loginUser };
+
+const logoutUser=asyncHandler(async(req,res)=>{
+ await User.findByIdAndUpdate(
+  req.user._id,
+  {
+    $set:{
+      refreshToken:undefined
+    }
+  },
+  {
+    new:true
+  }
+ )
+ const options={
+  httpOnly:true,
+  secure:true
+}
+return res
+.status(200)
+.clearCokkie("accessToken",options)
+.clearCokkie("refreshToken",options)
+.json(new ApiResponse(200,{},"User logout successfully"))
+})
+
+export { registerUser, loginUser , logoutUser };
