@@ -38,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //check for user creation
   //return the response
 
-  const { fullName, email, username, password } = req.body;
+  const { fullName, email, username, password } = req.body; //Destructures the user details (fullName, email, username, and password) from the request body sent by the frontend.
   console.log("email:", email);
 
   if (
@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "all fields are required");
   }
   const existedUser = await User.findOne({
-    $or: [{ username }, { email }],
+    $or: [{ username }, { email }], // $or is a mongodb operator
   });
 
   if (existedUser) {
@@ -60,7 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (
     req.files &&
     Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
+    req.files.coverImage.length > 0 // Checks if req.files.coverImage exists, is an array, and contains at least one file.
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
