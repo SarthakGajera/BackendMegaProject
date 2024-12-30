@@ -316,10 +316,10 @@ const updateUserCoverImage=asyncHandler(async(req,res)=>{
     {
       $set:{
         coverImage:coverImage.url
-      }
+      }// set is used for update operations in the user's document
 
     },
-    {new:true}
+    {new:true} // Ensures the updated user document is returned by findByIdAndUpdate.
   ).select("-password")
 
   return res
