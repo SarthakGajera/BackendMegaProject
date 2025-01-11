@@ -22,22 +22,18 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     if (!like) {
       throw new ApiError(400, "Error while liking the video");
     }
-    return res.status(
-      200,
-      like,
-      new ApiResponse(200, "Successfully liked the video")
-    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, like, "video liked successfully"));
   }
 
   const unlikeVideo = await Like.findByIdAndDelete(likedVideo._id);
   if (!unlikeVideo) {
     throw new ApiError(400, "Error while unliking the video");
   }
-  return res.status(
-    200,
-    unlikeVideo,
-    new ApiResponse(200, "successfully unliked the video")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, unlikeVideo, "Successfully unliked the video"));
 });
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
@@ -59,11 +55,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     if (!like) {
       throw new ApiError(400, "Error while liking the comment");
     }
-    return res.status(
-      200,
-      like,
-      new ApiResponse(200, "comment liked successfully")
-    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, like, "comment liked successfully"));
   }
 
   const unlikeComment = await Like.findByIdAndDelete(likedComment._id);
@@ -71,11 +65,11 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     throw new ApiError(200, "error while unliking the comment");
   }
 
-  return res.status(
-    200,
-    unlikeComment,
-    new ApiResponse(200, "Unliked comment successfully")
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, unlikeComment, "Successfully unliked the comment")
+    );
 });
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
@@ -97,14 +91,18 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     if (!like) {
       throw new ApiError(400, "Error while like the tweet");
     }
-    return res.status(200, like, "successfully liked the tweet");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, like, "tweet liked successfully"));
   }
 
   const unlikeTweet = await Like.findByIdAndDelete(likedTweet._id);
   if (!unlikeTweet) {
     throw new ApiError(400, "Error while unlike tweet");
   }
-  return res.status(200, unlikeTweet, "successfully unliked the tweet");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, unlikeTweet, "Successfully unliked the Tweet"));
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
@@ -171,7 +169,11 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     },
   ]);
 
-  return res.status(200, likedVideos, "successfully fetched liked video");
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, likedVideos, "Successfully fetched liked videos")
+    );
 });
 
 export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
