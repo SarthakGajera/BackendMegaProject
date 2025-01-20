@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import fs from "fs";
-import { subscribe } from "diagnostics_channel";
+
 import mongoose from "mongoose";
 
 const generateAccessAndRefereshTokens = async (userId) => {
