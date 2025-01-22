@@ -84,7 +84,7 @@ const updateTweet = asyncHandler(async (req, res) => {
     }
 
     const owner = req.user._id;
-    if (tweet?.owner !== owner) {
+    if (!tweet?.owner.equals(owner)) {
       throw new ApiError(400, "You are not allowed to update this tweet");
     }
 
@@ -120,7 +120,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
   }
   const owner = req.user._id;
 
-  if (tweet?.owner.toString() !== owner) {
+  if (!tweet?.owner.equals(owner)) {
     throw new ApiError(400, "You are not allowed to delete this tweet");
   }
 

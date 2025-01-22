@@ -9,14 +9,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
+  
+  // Find the video
   const video = await Video.findById(videoId);
   if (!video) {
     throw new ApiError(404, "video not found");
   }
-  const options = {
-    page,
-    limit,
-  };
+
+  // Convert pagination query params to numbers
+  const pageNumber = parseInt(page);
+  const pageSize = parseInt(limit);
+  const skip = (pageNumber - 1) * pageSize;
 
   const comments = await Comment.aggregate([
     {
@@ -26,9 +29,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: "users",
-        localField: "owner",
-        foreignField: "_id",
+        from: "users", // Ensure 'users' collection name is correct
+        localField: "owner", // Reference to user id
+        foreignField: "_id", // Foreign key in 'users' collection
         as: "createdBy",
         pipeline: [
           {
@@ -42,23 +45,19 @@ const getVideoComments = asyncHandler(async (req, res) => {
       },
     },
     {
-      $addFields: {
-        $createdBy: {
-          $first: "$createdBy",
-        },
-      },
-    },
-    {
-      $unwind: "$createdBy",
+      $unwind: "$createdBy", // Flatten the createdBy array
     },
     {
       $project: {
         content: 1,
-        createdBy: 1,
+        createdBy: 1, // Include the nested createdBy data
       },
     },
     {
-      $limit: parseInt(limit),
+      $skip: skip, // Pagination: skip previous comments based on page
+    },
+    {
+      $limit: pageSize, // Limit the number of results
     },
   ]);
 
@@ -66,6 +65,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, comments, "comments fetched successfully"));
 });
+
 
 const addComment = asyncHandler(async (req, res) => {
   // TODO: add a comment to a video
@@ -106,7 +106,7 @@ const updateComment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "orginal comment is missing");
   }
 
-  if (originalComment.owner !== user) {
+  if (originalComment.owner.equals(user)) {
     throw new ApiError(403, "you don't have the access to change the comment");
   }
   const updateComment = await Comment.findByIdAndUpdate(
@@ -133,7 +133,7 @@ const deleteComment = asyncHandler(async (req, res) => {
   if (!comment) {
     throw new ApiError(404, "comment not found");
   }
-  if (comment.owner !== user) {
+  if (!comment.owner.equals(user)) {
     throw new ApiError(
       403,
       "You dont have the permission to delete this comment"

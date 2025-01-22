@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {deleteFromCloudinary} from "../utils/cloudinary.js";
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -39,7 +40,7 @@ const updateVideo = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(400, "No video found ");
   }
-  if (video.owner !== req.user._id) {
+  if (!video.owner.equals(req.user._id)) {
     throw new ApiError(
       400,
       "You have not the permission to update the video details"
@@ -59,7 +60,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     videoId,
     {
       $set: {
-        title,
+        title:title,
         description,
         thumbnail: newThumbnail.url,
       },
@@ -81,7 +82,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(400, "video not found");
   }
-  if (video.owner !== req.user._id) {
+  if (!video.owner.equals(req.user._id)) {
     throw new ApiError(400, "You have not the permission to delete the video");
   }
   const cloudinaryDeleteVideoResponse = await deleteFromCloudinary(
@@ -118,7 +119,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(400, "video not found");
   }
-  if (video.owner !== req.user._id) {
+  if (!video.owner.equals(req.user._id)) {
     throw new ApiError(
       400,
       "you are not allowed to change the publish status of this video"
@@ -217,23 +218,23 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!(title || description)) {
     throw new ApiError(400, "all details are required");
   }
-  const videoLocalFilePath = req.files?.videoFile[0].path;
+  const videoLocalFilePath = req.files?.videoFile[0]?.path;
   if (!videoLocalFilePath) {
     throw new ApiError(400, "No video file found");
   }
   const videoFile = await uploadOnCloudinary(videoLocalFilePath);
-  if (videoFile.url) {
+  if (!videoFile.url) {
     throw new ApiError(500, "Error while uploading the file on cloudinary");
   }
 
-  const thumbnailLocalPath = req.files?.thumbnail[0].path;
+  const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
   if (!thumbnailLocalPath) {
-    throw new ApiError(500, "No thumbnail file found");
+    throw new ApiError(400, "No thumbnail file found");
   }
 
   const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
-  if (thumbnail.url) {
+  if (!thumbnail.url) {
     throw new ApiError(400, "Error while uploading thumbnail file");
   }
 
@@ -248,6 +249,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(400, "Error while creating the video");
   }
+  return res.status(200).json(new ApiResponse(200,video,"Video created successfully"))
 });
 
 export {
