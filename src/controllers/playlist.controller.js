@@ -114,7 +114,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
         description: 1
       }
     }
-  ]).toArray();
+  ]);
   if (!userPlaylists.length) {
     throw new ApiError(400, "No playlist found");
   }
